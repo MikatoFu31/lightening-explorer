@@ -1,14 +1,12 @@
-/*
-beta 10
-*/
-/*@TODO:http://chokuto.ifdef.jp/advanced/singleton1.html
 
-*/
 #packopt hide 1
 #packopt name "../../launcher.exe"
+
 #include "llmod3/llmod3.hsp"
 #include "llmod3/ime.hsp"
 #include "hspmath.as"
+#include "../extensions/ini.as"
+
 #uselib "user32.dll"
 	#func GetWindowLongA "GetWindowLongA" int , int
 	#func SetWindowLongA "SetWindowLongA" int , int , int
@@ -52,12 +50,14 @@ beta 10
 	dim matchnum,10
 	// to memorize how contents was matched with string u type
 	dim matches
-	// HSP厨ならわかるやろ
+	//
 	dim lcnt
 	// if value "matchnum" was fulled,this value will be turned 1 and end searching
 	dim endsearch
 	// memorize number of content u select
 	dim selectcontent
+
+	gosub *loadConfig
 
 	redraw 0
 		// back ground
@@ -252,11 +252,9 @@ beta 10
 
 *inputwindow
 	if wparam=38{
-		//↑(雑です許せ)
 		selectcontent=limit(selectcontent-1,0,matches-1)
 	}
 	if wparam=40{
-		//↓(雑d
 		selectcontent=limit(selectcontent+1,0,matches-1)
 	}
 	if iparam=27{
@@ -275,23 +273,52 @@ beta 10
 			gsel 0,-1
 			gsel 1,-1
 			exec strone,0,"open"
-//			alpha = 80
-//			while rounded = 0
-//				SetLayered background , 0 , alpha*255/100 , 2
-//				alpha = alpha + (0-alpha)/5
-//				rounded = intf(alpha)
-//				await 1
-//			wend
+			/* alpha = 80
+			while rounded = 0
+				SetLayered background , 0 , alpha*255/100 , 2
+				alpha = alpha + (0-alpha)/5
+				rounded = intf(alpha)
+				await 1
+			wend */
 			end
 		}else{
 			screen 0,1,1,screen_hide
 			gsel 0,-1
 			gsel 1,-1
-			exec "https://www.google.com/search?q=" + search, 16
+
+			switch settings_searchengine
+				case "google"
+					url = "https://www.google.com/search?q=" + search
+					swbreak
+				case "yahoo"
+					url = "https://search.yahoo.co.jp/search?p=" + search
+					swbreak
+				case "bing"
+					url = "https://www.bing.com/search?q=" + search
+					swbreak
+			swend
+
+			exec url, 16
 		}
 	}
 	return
 
+*loadConfig
+		ini_path = "./settings.ini"
+		ini_setpath ini_path
+
+		exist ini_path
+		if strsize = -1{
+			ini_puts "lightning_explorer", "search_engine", "yahoo"
+		}
+    settings_searchengine = ini_gets("lightning_explorer", "search_engine")
+    return
+
+*saveConfig
+	ini_puts "lightning_explorer", "search_engine", settings_searchengine
+  return
+
 *closeApp
 	gsel 0,-1
+	gosub *saveConfig
 	end

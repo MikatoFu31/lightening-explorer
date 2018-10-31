@@ -4,8 +4,10 @@ changelog.txt
 *obj
 *packfile
 *.rsv
+*.ax
 start.ax
 built/*
 src/lightning_explorer/KosugiMaru-Regular.ttf
+src/lightning_explorer/a.hsp
 launcher
-*.ax
+*.ini
