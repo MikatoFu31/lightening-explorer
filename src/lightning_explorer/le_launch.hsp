@@ -65,9 +65,10 @@ beta 10
 		color 0,0,0: boxf
 		gsel 1,-1
 		background = hwnd
+
 		// main window
 		bgscr 0,ginfo_dispx/2,onecontenty*(length(matchnum)+1),screen_tool+screen_hide,ginfo_dispx/4,ginfo_dispy/8,ginfo_dispx/2,onecontenty
-		title "Lightning Explorer beta"
+		title "Lightning Explorer Searching Screen"
 
 		// display font
 		globalFont = "Yu Gothic"
@@ -83,32 +84,35 @@ beta 10
 		imeinit dum,0
 		pos 0,0
 	redraw 1
+
 *main
 	redraw 0
-	// main loop
-	SetLayered background , 0 , alpha*255/100 , 2
-	if (strlen(search)!=0) {
-		isMached = 1
-	}else{
-		isMached = 0
-	}
-	alpha = 1.0000 * (alpha + (isMached*80-alpha)/10)
-	if strlen(searchone)=0{
-		m_widthy = 1.0000 * (m_widthy + (onecontenty - m_widthy) / 7)
-	}else{
-		m_widthy = 1.0000 * (m_widthy + (onecontenty*(length(matchnum)+1) - m_widthy) / 5)
-	}
-	width ginfo_dispx/2, m_widthy
+		// main loop
+		SetLayered background , 0 , alpha*255/100 , 2
+		if (strlen(search)!=0) {
+			isMached = 1
+		}else{
+			isMached = 0
+		}
+		alpha = 1.0000 * (alpha + (isMached*80-alpha)/10)
+		if strlen(searchone)=0{
+			m_widthy = 1.0000 * (m_widthy + (onecontenty - m_widthy) / 7)
+		}else{
+			m_widthy = 1.0000 * (m_widthy + (onecontenty*(length(matchnum)+1) - m_widthy) / 5)
+		}
+		width ginfo_dispx/2, m_widthy
 
-	gosub *searchwindow
-	gosub *search_mes
-	gosub *cursol
-	gosub *searchwindow_fin
-	gosub *windowcheck
+		gosub *searchWindow
+		gosub *writeSearchWindow
+		gosub *refreshCursol
+		gosub *finishDrawingSearchWindow
+		gosub *windowCheck
+
 	redraw 1
 	await 10
 	goto *main
-*searchwindow
+
+*searchWindow
 	// window frame and backcolor
 	redraw 0
 	color 240,240,240
@@ -120,7 +124,8 @@ beta 10
 	color 240,240,240
 	boxf 2,inputy,ginfo_sx-3,ginfo_sy-3
 	return
-*search_mes
+
+*writeSearchWindow
 	//strings. when u inputput nothing,this will show "search program..." . when u input something,this will show strings u input and result.
 	if strlen(search)=0{
 		color 192,192,192
@@ -168,11 +173,13 @@ beta 10
 		gosub *result
 	}
 	return
-*searchwindow_fin
+
+*finishDrawingSearchWindow
 	//reflect changes about UI.
 	redraw 1
 	return
-*cursol
+
+*refreshCursol
 	//to blink cursol
 	cusl=(cusl+1)\50
 	if cusl<25{
@@ -180,11 +187,13 @@ beta 10
 		boxf 20 + meslength,inputy-fontsize/2,20 + meslength+fontsize/2,inputy-fontsize/2
 	}
 	return
+
 *result
 	//when u input a character or delete,this code will be run once.
 	searchone=strtrim(search,0,32)
 	gosub *match
 	return
+
 *match
 	//search strings you input
 	repeat length(matchnum)
@@ -233,12 +242,14 @@ beta 10
 	loop
 	matches++ // to add "Search xxxx on web."
 	return
-*windowcheck
+
+*windowCheck
 	//active window check
 	if ginfo_act!0{
 		gosub *closeApp
 	}
 	return
+
 *inputwindow
 	if wparam=38{
 		//↑(雑です許せ)
