@@ -70,7 +70,7 @@ beta 10
 		title "Lightning Explorer beta"
 
 		// display font
-		globalFont = "游ゴシック"
+		globalFont = "Yu Gothic"
 
 		SetLayered background , 0 , 0*255/100 , 2
 		GetWindowLongA background, -20
