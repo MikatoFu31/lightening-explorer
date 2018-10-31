@@ -10,9 +10,9 @@ beta 10
 #include "llmod3/ime.hsp"
 #include "hspmath.as"
 #uselib "user32.dll"
-	#func GetWindowLongA "GetWindowLongA" int , int 
-	#func SetWindowLongA "SetWindowLongA" int , int , int 
-	#func SetLayered "SetLayeredWindowAttributes" int , int , int , int 
+	#func GetWindowLongA "GetWindowLongA" int , int
+	#func SetWindowLongA "SetWindowLongA" int , int , int
+	#func SetLayered "SetLayeredWindowAttributes" int , int , int , int
 *init
 	// Load Files,Initialize Values,and Make window
 	// file index(full path)
@@ -68,10 +68,10 @@ beta 10
 		// main window
 		bgscr 0,ginfo_dispx/2,onecontenty*(length(matchnum)+1),screen_tool+screen_hide,ginfo_dispx/4,ginfo_dispy/8,ginfo_dispx/2,onecontenty
 		title "Lightning Explorer beta"
-	
+
 		// display font
-		globalFont = "MotoyaLMaru"
-	
+		globalFont = "ü‡ÉSÉVÉbÉN"
+
 		SetLayered background , 0 , 0*255/100 , 2
 		GetWindowLongA background, -20
 		SetWindowLongA background, -20 , stat | 0x00080000
@@ -99,7 +99,7 @@ beta 10
 		m_widthy = 1.0000 * (m_widthy + (onecontenty*(length(matchnum)+1) - m_widthy) / 5)
 	}
 	width ginfo_dispx/2, m_widthy
-	
+
 	gosub *searchwindow
 	gosub *search_mes
 	gosub *cursol
@@ -148,10 +148,10 @@ beta 10
 				lastLine++
 			}
 		loop
-		
+
 		color 0, 139, 128 : pos fontsize+2, inputy*(lastLine+1) + fontposy
 		mes "Search \"" + search + "\" on web."
-		
+
 		if matches!0{
 			color 172, 186, 201 : boxf 2,inputy*(1+selectcontent),ginfo_sx-3,inputy*(2+selectcontent)
 			pos fontsize+2,inputy*(1+selectcontent)+fontposy
@@ -252,7 +252,7 @@ beta 10
 		//if u typed escape key,this program will not do anything and exit this program.
 		gosub *closeApp
 	}
-	
+
 	if iparam=13{
 		//if u typed enter key,the app u selected will be started
 		if search="":end
@@ -280,7 +280,7 @@ beta 10
 		}
 	}
 	return
-	
+
 *closeApp
 	gsel 0,-1
 	end
