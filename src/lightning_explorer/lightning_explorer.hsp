@@ -7,6 +7,7 @@
 #include "user32.as"
 #include "kernel32.as"
 #include "../extensions/hotkey.hsp"
+#include "../extensions/ini.as"
 //#include "../extensions/hspext.as"
 #include "hspmath.as"
 //////////////////////////////////////////// winapiが動かねぇ
@@ -93,9 +94,8 @@
 
 	onExit gosub *hideWindow
 
-	oncmd gosub *OnTaskbarCreated, stat // "TaskbarCreated"
-	oncmd gosub *OnCommand, 0x0111 		// COMMAND
-	oncmd gosub *OnTrayIcon, 0x0401 	// WM_TRAYICON
+	en_font 	= "Gadugi Bold"
+	univ_font = "游ゴシック"
 
 	software_version = "1.2.6 Dev"
 
@@ -105,16 +105,16 @@
 	bgscr , 300, 80, , (ginfo_dispx - 300) / 2, (ginfo_dispy - 80) / 2
 	color 197, 211, 226 : boxf
 	color 140, 154, 169 : boxf 20,13,25,67
-	font "Gadugi Bold", 25 	: color 28, 42, 57		: pos 36, 14 : mes "Lightning Explorer"
-	font "Gadugi Bold", 13 	: color 108, 122, 137	: pos 160, 45 : mes "version" + software_version
+	font en_font , 25 	: color 28, 42, 57		: pos 36, 14 : mes "Lightning Explorer"
+	font en_font , 13 	: color 108, 122, 137	: pos 160, 45 : mes "version" + software_version
 
 	gosub *AddTaskbarIcon
+	gosub *loadConfig
+	oncmd gosub *OnTaskbarCreated, stat // "TaskbarCreated"
+	oncmd gosub *OnCommand, 0x0111 		// COMMAND
+	oncmd gosub *OnTrayIcon, 0x0401 	// WM_TRAYICON
 
 	exist "playindex.rsv"
-
-	fontFilePath = "KosugiMaru-Regular.ttf"
-
-	addFont fontFilePath // フォントを追加
 
 	if strsize = -1 {
 		isFirstBoot = 1
@@ -125,15 +125,10 @@
 	}
 	gosub *hideWindow
 
-
-
 	addhotkey 'S',3,*openLauncher // TODO: ホットキーを設定画面から変更
 
 	stop
 
-//
-// タスクトレイにアイコン表示
-//
 *AddTaskbarIcon
 
 	// 自身のアイコン取得
@@ -162,9 +157,6 @@
 
 	return
 
-//
-// タスクトレイのイコン削除
-//
 *DeleteTaskbarIcon
 
 	// NOTIFYICONDATA 構造体
@@ -179,9 +171,6 @@
 
 	return
 
-//
-// *OnTaskbarCreated
-//
 *OnTaskbarCreated
 
 	// タスクトレイにアイコン表示
@@ -189,23 +178,16 @@
 
 	return
 
-//
-// *OnClose
-//
 *onClose
 
 	// タスクバーのアイコン削除
 	dialog "Are you sure you want to exit?" ,2
 	if	(stat = 6){
 		gosub *DeleteTaskbarIcon
-		removeFont fontFilePath
 		end
 	}
 	return
 
-//
-// *OnTrayIcon
-//
 *OnTrayIcon
 
 	if (wparam == 1) {
@@ -235,24 +217,15 @@
 		InsertMenu hPopupMenu,3,0x400,3,"Exit"
 		TrackPopupMenu hPopupMenu,0x20,ginfo(0),ginfo(1),0,hwnd,0
 		DestroyMenu hPopupMenu
-return
+	return
 
 *onCommand
 	switch wparam & 0xffff
 		case 0
 			gosub *openLauncher
 		swbreak
-		case 1 //////////////// setting window ////////////////////////////////////////////////////////////////
-			gsel 0, 2
-			screen 0
-			title "Settings"
-			width 300,300
-			color 140, 154, 169 : boxf 20,13,25,67
-			font "Gadugi Bold", 25 	: color 28, 42, 57		: pos 36, 14 : mes "Settings"
-			font "Gadugi Bold", 13 	: color 108, 122, 137	: pos 50, 45 : mes "Lightning Explorer version" + software_version
-			color 236, 240, 241 : boxf 0, 80, 300, 300
-			pos 200,250 : button gosub "exit", *onClose
-			SetWindowLong hwnd,-16,$16CA0000
+		case 1
+			gosub *openSettings
 		swbreak
 		case 2 //////////////// creating index window /////////////////////////////////////////////////////////
 			dialog "Are you sure you want to make new index? \nOld one will be overwriten." ,2
@@ -268,15 +241,39 @@ return
 		default
 		swbreak
 	swend
-return
+	return
 
 *openLauncher
 	exec "launcher.exe"
+	return
+
+*openSettings //////////////// setting window ////////////////////////////////////////////////////////////////
+  bgscr 1, 300, 300
+	gsel 1, 2
+	screen 1
+	title "Settings"
+	width 300,300
+	color 140, 154, 169 : boxf 20,13,25,67
+	font en_font, 25 	: color 28, 42, 57		: pos 36, 14 : mes "Settings"
+	font en_font, 13 	: color 108, 122, 137	: pos 50, 45 : mes "Lightning Explorer version" + software_version
+	color 236, 240, 241 : boxf 0, 80, 300, 300
+
+	font en_font, 15 	: color 28, 42, 57 : pos 20, 100 : mes "Search Engine"
+	pos 140, 100 : objsize 120,24
+	combox settings_searchengine, 120, "Google\nYahoo\nBing"
+
+	pos 20,250 : button gosub "Save and Exit", *saveAndExit
+	pos 145,250 : button gosub "Quit", *onClose
+	SetWindowLong hwnd,-16,$16CA0000
 return
+
+*saveAndExit
+	gosub *saveConfig
+	gsel 0, -1
 
 *hideLogScreen
 	gsel 0, -1
-return
+	return
 
 *startIndexing
 	exist "filetype.rsv"
@@ -305,7 +302,7 @@ return
 				dots = dots + "."
 			loop
 			color 255,255,255 : boxf
-			pos 246, 83 : font "Gadugi Bold",18 : color 0,0,0 : mes "Creating index" + dots
+			pos 246, 83 : font en_font,18 : color 0,0,0 : mes "Creating index" + dots
 			pipeget ln          ; パイプの取得/更新
 			if stat=0 : break   ; 実行終了ならループを抜ける
 			await 100
@@ -325,9 +322,9 @@ return
 		screen 0, 640, 480
 		title "Index creation log"
 		color 140, 154, 169 : boxf 20,17,25,67
-		font "Gadugi Bold", 25 	: color 28, 42, 57		: pos 36, 18 : mes "Index creation log"
-		font "Gadugi Bold", 13 	: color 108, 122, 137	: pos 50, 49 : mes "Lightning Explorer version" + software_version
-		font "メイリオ", 14 		: color 60, 74, 89		: pos 20, 85 : mes "" + itemsCount + " items were found and included to the index."
+		font en_font, 25 	: color 28, 42, 57		: pos 36, 18 : mes "Index creation log"
+		font en_font, 13 	: color 108, 122, 137	: pos 50, 49 : mes "Lightning Explorer version" + software_version
+		font univ_font, 14 		: color 60, 74, 89		: pos 20, 85 : mes "" + itemsCount + " items were found and included to the index."
 		pos 20,110 : mesbox buf,600,330,4
 		pos 290, 445 : button gosub "OK", *hideLogScreen
 
@@ -337,4 +334,19 @@ return
 			isFirstBoot = 0
 		}
 	}
-return
+	return
+
+*loadConfig
+		ini_path = "./settings.ini"
+		ini_setpath ini_path
+
+		exist ini_path
+		if strsize = -1{
+			ini_puti "lightning_explorer", "search_engine", 0
+		}
+    settings_searchengine = ini_geti("lightning_explorer", "search_engine")
+    return
+
+*saveConfig
+	ini_puti "lightning_explorer", "search_engine", settings_searchengine
+  return

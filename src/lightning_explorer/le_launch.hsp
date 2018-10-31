@@ -1,6 +1,6 @@
 
 #packopt hide 1
-#packopt name "../../launcher.exe"
+#packopt name "launcher.exe"
 
 #include "llmod3/llmod3.hsp"
 #include "llmod3/ime.hsp"
@@ -287,13 +287,13 @@
 			gsel 1,-1
 
 			switch settings_searchengine
-				case "google"
+				case 0
 					url = "https://www.google.com/search?q=" + search
 					swbreak
-				case "yahoo"
+				case 1
 					url = "https://search.yahoo.co.jp/search?p=" + search
 					swbreak
-				case "bing"
+				case 2
 					url = "https://www.bing.com/search?q=" + search
 					swbreak
 			swend
@@ -309,13 +309,13 @@
 
 		exist ini_path
 		if strsize = -1{
-			ini_puts "lightning_explorer", "search_engine", "yahoo"
+			ini_puti "lightning_explorer", "search_engine", 0
 		}
-    settings_searchengine = ini_gets("lightning_explorer", "search_engine")
+    settings_searchengine = ini_geti("lightning_explorer", "search_engine")
     return
 
 *saveConfig
-	ini_puts "lightning_explorer", "search_engine", settings_searchengine
+	ini_puti "lightning_explorer", "search_engine", settings_searchengine
   return
 
 *closeApp
