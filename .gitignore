@@ -8,3 +8,4 @@ start.ax
 built/*
 src/lightning_explorer/KosugiMaru-Regular.ttf
 launcher
+*.ax

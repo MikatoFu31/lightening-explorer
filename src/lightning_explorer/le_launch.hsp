@@ -52,7 +52,7 @@ beta 10
 	dim matchnum,10
 	// to memorize how contents was matched with string u type
 	dim matches
-	// HSP~‚È‚ç‚í‚©‚é‚â‚ë
+	// HSPå¨ãªã‚‰ã‚ã‹ã‚‹ã‚„ã‚
 	dim lcnt
 	// if value "matchnum" was fulled,this value will be turned 1 and end searching
 	dim endsearch
@@ -70,7 +70,7 @@ beta 10
 		title "Lightning Explorer beta"
 
 		// display font
-		globalFont = "ŸàƒSƒVƒbƒN"
+		globalFont = "æ¸¸ã‚´ã‚·ãƒƒã‚¯"
 
 		SetLayered background , 0 , 0*255/100 , 2
 		GetWindowLongA background, -20
@@ -241,11 +241,11 @@ beta 10
 	return
 *inputwindow
 	if wparam=38{
-		//ª(G‚Å‚·‹–‚¹)
+		//â†‘(é›‘ã§ã™è¨±ã›)
 		selectcontent=limit(selectcontent-1,0,matches-1)
 	}
 	if wparam=40{
-		//«(Gd
+		//â†“(é›‘d
 		selectcontent=limit(selectcontent+1,0,matches-1)
 	}
 	if iparam=27{

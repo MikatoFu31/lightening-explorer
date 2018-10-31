@@ -9,7 +9,7 @@
 #include "../extensions/hotkey.hsp"
 //#include "../extensions/hspext.as"
 #include "hspmath.as"
-//////////////////////////////////////////// winapi‚ª“®‚©‚Ë‚¥
+//////////////////////////////////////////// winapiãŒå‹•ã‹ã­ã‡
 #module
 /*	#func  CloseHandle  "CloseHandle"  int
 	#cfunc CreateMutex  "CreateMutexA" int, int, sptr
@@ -45,45 +45,45 @@
 		RemoveFontResourceExA fontFileName, 0x10, 1
 		sendmsg 0xffff, 0x001D, 0, 0
 	return
-	
-	// Šù‹N“®”»’è
+
+	// æ—¢èµ·å‹•åˆ¤å®š
 	#define ERROR_ALREADY_EXISTS    183
-	
-	; ƒ~ƒ…[ƒeƒbƒNƒXƒIƒuƒWƒFƒNƒg‚Ì–¼‘O‚Ì’è‹`
-	; (ƒAƒvƒŠƒP[ƒVƒ‡ƒ“ŒÅ—L‚Ì–¼‘O‚É‚·‚é•K—v‚ª‚ ‚è‚Ü‚·)
+
+	; ãƒŸãƒ¥ãƒ¼ãƒ†ãƒƒã‚¯ã‚¹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®åå‰ã®å®šç¾©
+	; (ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³å›ºæœ‰ã®åå‰ã«ã™ã‚‹å¿…è¦ãŒã‚ã‚Šã¾ã™)
 	#define MUTEX_NAME  "HSP_lightning_explorer"
-	
-	; ‚±‚ÌƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ª‚·‚Å‚É‹N“®‚³‚ê‚Ä‚¢‚é‚©‚Ç‚¤‚©‚ğæ“¾‚·‚éŠÖ”
+
+	; ã“ã®ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ãŒã™ã§ã«èµ·å‹•ã•ã‚Œã¦ã„ã‚‹ã‹ã©ã†ã‹ã‚’å–å¾—ã™ã‚‹é–¢æ•°
 	#defcfunc AlreadyAppRunning
-	
+
 	if (hMutex == 0) {
-	    ; –¼‘O•t‚«ƒ~ƒ…[ƒeƒbƒNƒXƒIƒuƒWƒFƒNƒg‚Ìì¬
+	    ; åå‰ä»˜ããƒŸãƒ¥ãƒ¼ãƒ†ãƒƒã‚¯ã‚¹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ä½œæˆ
 	    hMutex = CreateMutex(0, 0, MUTEX_NAME)
-	
-	    ; ƒIƒuƒWƒFƒNƒg‚ª‚·‚Å‚Éì¬‚³‚ê‚Ä‚¢‚½‚©‚Ç‚¤‚©‚Ì”»•Ê
+
+	    ; ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒã™ã§ã«ä½œæˆã•ã‚Œã¦ã„ãŸã‹ã©ã†ã‹ã®åˆ¤åˆ¥
 	    if (GetLastError() == ERROR_ALREADY_EXISTS) {
-	        ; ‚·‚Å‚É“¯‚¶–¼‘O‚ÌƒIƒuƒWƒFƒNƒg‚ª‘¶İ‚·‚é
+	        ; ã™ã§ã«åŒã˜åå‰ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒå­˜åœ¨ã™ã‚‹
 	        alreadyRunning = 1
 	    } else {
-	        ; ƒIƒuƒWƒFƒNƒg‚ªV‚µ‚­ì¬‚³‚ê‚½
+	        ; ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒæ–°ã—ãä½œæˆã•ã‚ŒãŸ
 	        alreadyRunning = 0
 	    }
 	}
 	return alreadyRunning
-	
-	; ƒNƒŠ[ƒ“ƒAƒbƒvˆ—iI—¹‚É©“®Àsj
+
+	; ã‚¯ãƒªãƒ¼ãƒ³ã‚¢ãƒƒãƒ—å‡¦ç†ï¼ˆçµ‚äº†æ™‚ã«è‡ªå‹•å®Ÿè¡Œï¼‰
 	#deffunc CleanupAppRunChecker onexit
 	if (hMutex != 0) {
-	    ; ƒ~ƒ…[ƒeƒbƒNƒXƒIƒuƒWƒFƒNƒgƒnƒ“ƒhƒ‹‚ÌƒNƒ[ƒY
+	    ; ãƒŸãƒ¥ãƒ¼ãƒ†ãƒƒã‚¯ã‚¹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãƒãƒ³ãƒ‰ãƒ«ã®ã‚¯ãƒ­ãƒ¼ã‚º
 	    CloseHandle hMutex
 	    hMutex = 0
 	}
 	return
 #global
-// 
-// ƒƒCƒ“
-// 
-	// Š„‚è‚İ
+//
+// ãƒ¡ã‚¤ãƒ³
+//
+	// å‰²ã‚Šè¾¼ã¿
 	if (AlreadyAppRunning()) {
 		gsel 0, -1
     	dialog "This program has already started.",1
@@ -96,10 +96,10 @@
 	oncmd gosub *OnTaskbarCreated, stat // "TaskbarCreated"
 	oncmd gosub *OnCommand, 0x0111 		// COMMAND
 	oncmd gosub *OnTrayIcon, 0x0401 	// WM_TRAYICON
-	
+
 	software_version = "1.2.6 Dev"
-	
-	// ƒ^ƒXƒNƒgƒŒƒC‚ÉƒAƒCƒRƒ“•\¦
+
+	// ã‚¿ã‚¹ã‚¯ãƒˆãƒ¬ã‚¤ã«ã‚¢ã‚¤ã‚³ãƒ³è¡¨ç¤º
 	screen 0
 	title "Lightning Explorer"
 	bgscr , 300, 80, , (ginfo_dispx - 300) / 2, (ginfo_dispy - 80) / 2
@@ -107,15 +107,15 @@
 	color 140, 154, 169 : boxf 20,13,25,67
 	font "Gadugi Bold", 25 	: color 28, 42, 57		: pos 36, 14 : mes "Lightning Explorer"
 	font "Gadugi Bold", 13 	: color 108, 122, 137	: pos 160, 45 : mes "version" + software_version
-	
+
 	gosub *AddTaskbarIcon
-	
+
 	exist "playindex.rsv"
 
 	fontFilePath = "KosugiMaru-Regular.ttf"
-	
-	addFont fontFilePath // ƒtƒHƒ“ƒg‚ğ’Ç‰Á
-	
+
+	addFont fontFilePath // ãƒ•ã‚©ãƒ³ãƒˆã‚’è¿½åŠ 
+
 	if strsize = -1 {
 		isFirstBoot = 1
 		dialog "Thank you for installing Lightning Explorer.\nWhen you close this dialog it will start indexing."
@@ -124,30 +124,30 @@
 		isFirstBoot = 0
 	}
 	gosub *hideWindow
-	
-	
 
-	addhotkey 'S',3,*openLauncher // TODO: ƒzƒbƒgƒL[‚ğİ’è‰æ–Ê‚©‚ç•ÏX
+
+
+	addhotkey 'S',3,*openLauncher // TODO: ãƒ›ãƒƒãƒˆã‚­ãƒ¼ã‚’è¨­å®šç”»é¢ã‹ã‚‰å¤‰æ›´
 
 	stop
 
-// 
-// ƒ^ƒXƒNƒgƒŒƒC‚ÉƒAƒCƒRƒ“•\¦
-// 
+//
+// ã‚¿ã‚¹ã‚¯ãƒˆãƒ¬ã‚¤ã«ã‚¢ã‚¤ã‚³ãƒ³è¡¨ç¤º
+//
 *AddTaskbarIcon
 
-	// ©g‚ÌƒAƒCƒRƒ“æ“¾
+	// è‡ªèº«ã®ã‚¢ã‚¤ã‚³ãƒ³å–å¾—
 	sdim FileName, 260
 	GetModuleFileName hModule, varptr(FileName), 260
 	ExtractIconEx varptr(FileName), 0, 0, varptr(hIconSmall), 1
 	hIcon = hIconSmall(0)
 
-	// ©g‚ÌƒEƒBƒ“ƒhƒEƒ^ƒCƒgƒ‹æ“¾
+	// è‡ªèº«ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚¿ã‚¤ãƒˆãƒ«å–å¾—
 	GetWindowTextLength hwnd
 	sdim WindowTitle, stat + 1
 	GetWindowText hwnd, varptr(WindowTitle), stat + 1
 
-	// NOTIFYICONDATA \‘¢‘Ì
+	// NOTIFYICONDATA æ§‹é€ ä½“
 	dim IconData,22
 	IconData(0) = 88
 	IconData(1) = hwnd
@@ -157,44 +157,44 @@
 	IconData(5) = hIcon
 	poke IconData, 4 * 6, WindowTitle
 
-	// ƒ^ƒXƒNƒo[‚ÉƒAƒCƒRƒ“•\¦
+	// ã‚¿ã‚¹ã‚¯ãƒãƒ¼ã«ã‚¢ã‚¤ã‚³ãƒ³è¡¨ç¤º
 	Shell_NotifyIcon 0x00000000, varptr(IconData) // NIM_ADD
 
 	return
 
-// 
-// ƒ^ƒXƒNƒgƒŒƒC‚ÌƒCƒRƒ“íœ
-// 
+//
+// ã‚¿ã‚¹ã‚¯ãƒˆãƒ¬ã‚¤ã®ã‚¤ã‚³ãƒ³å‰Šé™¤
+//
 *DeleteTaskbarIcon
 
-	// NOTIFYICONDATA \‘¢‘Ì
+	// NOTIFYICONDATA æ§‹é€ ä½“
 	dim IconData,22
 	IconData(0) = 88
 	IconData(1) = hwnd
 	IconData(2) = 1
 	IconData(3) = 0x0002 // NIF_ICON
 
-	// ƒ^ƒXƒNƒo[‚ÌƒAƒCƒRƒ“íœ
+	// ã‚¿ã‚¹ã‚¯ãƒãƒ¼ã®ã‚¢ã‚¤ã‚³ãƒ³å‰Šé™¤
 	Shell_NotifyIcon 0x00000002, varptr(IconData) // NIM_DELETE
 
 	return
 
-// 
+//
 // *OnTaskbarCreated
-// 
+//
 *OnTaskbarCreated
 
-	// ƒ^ƒXƒNƒgƒŒƒC‚ÉƒAƒCƒRƒ“•\¦
+	// ã‚¿ã‚¹ã‚¯ãƒˆãƒ¬ã‚¤ã«ã‚¢ã‚¤ã‚³ãƒ³è¡¨ç¤º
 	gosub *AddTaskbarIcon
 
 	return
 
-// 
+//
 // *OnClose
-// 
+//
 *onClose
 
-	// ƒ^ƒXƒNƒo[‚ÌƒAƒCƒRƒ“íœ
+	// ã‚¿ã‚¹ã‚¯ãƒãƒ¼ã®ã‚¢ã‚¤ã‚³ãƒ³å‰Šé™¤
 	dialog "Are you sure you want to exit?" ,2
 	if	(stat = 6){
 		gosub *DeleteTaskbarIcon
@@ -203,9 +203,9 @@
 	}
 	return
 
-// 
+//
 // *OnTrayIcon
-// 
+//
 *OnTrayIcon
 
 	if (wparam == 1) {
@@ -273,7 +273,7 @@ return
 *openLauncher
 	exec "launcher.exe"
 return
-	
+
 *hideLogScreen
 	gsel 0, -1
 return
@@ -292,7 +292,7 @@ return
 	sdim ln,4096
 	sdim buf,128000
 	buf = ""
-	pipeexec buf, "makeindex.exe /h",1 // TODO: makeindex.exe‚ğ/h‚É‘Î‰‚³‚¹‚éiƒƒO•\¦ƒEƒBƒ“ƒhƒE‚ğ‚È‚­‚·j
+	pipeexec buf, "makeindex.exe /h",1 // TODO: makeindex.exeã‚’/hã«å¯¾å¿œã•ã›ã‚‹ï¼ˆãƒ­ã‚°è¡¨ç¤ºã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ãªãã™ï¼‰
 	if (stat) {
 		dialog "Sorry. An error has occared while creating index.",1
 	}else{
@@ -306,11 +306,11 @@ return
 			loop
 			color 255,255,255 : boxf
 			pos 246, 83 : font "Gadugi Bold",18 : color 0,0,0 : mes "Creating index" + dots
-			pipeget ln          ; ƒpƒCƒv‚Ìæ“¾/XV
-			if stat=0 : break   ; ÀsI—¹‚È‚çƒ‹[ƒv‚ğ”²‚¯‚é
+			pipeget ln          ; ãƒ‘ã‚¤ãƒ—ã®å–å¾—/æ›´æ–°
+			if stat=0 : break   ; å®Ÿè¡Œçµ‚äº†ãªã‚‰ãƒ«ãƒ¼ãƒ—ã‚’æŠœã‘ã‚‹
 			await 100
 		loop
-		
+
 		itemsCount = 0
 		offset = 0
 		result = 0
@@ -321,16 +321,16 @@ return
 			await
 		wend
 		itemsCount = itemsCount - 1
-		
+
 		screen 0, 640, 480
 		title "Index creation log"
 		color 140, 154, 169 : boxf 20,17,25,67
 		font "Gadugi Bold", 25 	: color 28, 42, 57		: pos 36, 18 : mes "Index creation log"
 		font "Gadugi Bold", 13 	: color 108, 122, 137	: pos 50, 49 : mes "Lightning Explorer version" + software_version
-		font "ƒƒCƒŠƒI", 14 		: color 60, 74, 89		: pos 20, 85 : mes "" + itemsCount + " items were found and included to the index."
+		font "ãƒ¡ã‚¤ãƒªã‚ª", 14 		: color 60, 74, 89		: pos 20, 85 : mes "" + itemsCount + " items were found and included to the index."
 		pos 20,110 : mesbox buf,600,330,4
 		pos 290, 445 : button gosub "OK", *hideLogScreen
-		
+
 		dialog "Index creation was completed."
 		if isFirstBoot = 1{
 			dialog "Let's search programs with \"Ctrl + Alt + S\" !"
