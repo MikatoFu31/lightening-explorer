@@ -1,0 +1,286 @@
+/*
+beta 10
+*/
+/*@TODO:http://chokuto.ifdef.jp/advanced/singleton1.html
+
+*/
+#packopt hide 1
+#packopt name "../../launcher.exe"
+#include "llmod3/llmod3.hsp"
+#include "llmod3/ime.hsp"
+#include "hspmath.as"
+#uselib "user32.dll"
+	#func GetWindowLongA "GetWindowLongA" int , int 
+	#func SetWindowLongA "SetWindowLongA" int , int , int 
+	#func SetLayered "SetLayeredWindowAttributes" int , int , int , int 
+*init
+	// Load Files,Initialize Values,and Make window
+	// file index(full path)
+	sdim index,1048576
+	exist "playindex.rsv" : if strsize <=0 : dialog "The file \"playindex.rsv\" was not found.\nPlease make index first." ,1 : end
+	bload "playindex.rsv",index
+	// file index(file name only)
+	sdim fnindex,1048576
+	exist "playindex_fn.rsv" : if strsize <=0 : dialog "The file \"playindex_fn.rsv\" was not found.\nPlease make index first." ,1 : end
+	bload "playindex_fn.rsv",fnindex
+	// y size of one line of contents
+	dim onecontenty
+	onecontenty=ginfo_dispy/15
+	// string u input
+	sdim search,1024
+	// string u input.this will use for detect changes
+	sdim searchpast,1024
+	// processed string u input
+	sdim searchone,1024
+	// for centering characters of input box in y axis
+	dim inputy
+	inputy=onecontenty
+	// using to blink cursol
+	dim cusl
+	// fontsize it will depend on one content size.
+	dim fontsize
+	fontsize=onecontenty/2
+	// for centering characters of input box in y axis
+	dim fontposy
+	fontposy=onecontenty/4
+	// to detect x position of cursol
+	dim meslength
+	onkey gosub *inputwindow
+	// for processing strings
+	sdim strone,1024
+	// to memorize which contents was matched with string u type
+	dim matchnum,10
+	// to memorize how contents was matched with string u type
+	dim matches
+	// HSP~‚È‚ç‚í‚©‚é‚â‚ë
+	dim lcnt
+	// if value "matchnum" was fulled,this value will be turned 1 and end searching
+	dim endsearch
+	// memorize number of content u select
+	dim selectcontent
+
+	redraw 0
+		// back ground
+		bgscr 1, ginfo(20), ginfo(21),0,0,0
+		color 0,0,0: boxf
+		gsel 1,-1
+		background = hwnd
+		// main window
+		bgscr 0,ginfo_dispx/2,onecontenty*(length(matchnum)+1),screen_tool,ginfo_dispx/4,ginfo_dispy/8,ginfo_dispx/2,onecontenty
+		title "Lightning Explorer beta"
+	
+		// display font
+		globalFont = "MotoyaLMaru"
+	
+		SetLayered background , 0 , 0*255/100 , 2
+		GetWindowLongA background, -20
+		SetWindowLongA background, -20 , stat | 0x00080000
+		alpha = 0
+		gsel 1,1
+		gsel 0,2
+		pos ginfo_sx,ginfo_sy
+		mesbox search,0,0
+		imeinit dum,0
+		pos 0,0
+	redraw 1
+*main
+	redraw 0
+	// main loop
+	SetLayered background , 0 , alpha*255/100 , 2
+	if (strlen(search)!=0) {
+		isMached = 1
+	}else{
+		isMached = 0
+	}
+	alpha = 1.0000 * (alpha + (isMached*80-alpha)/10)
+	if strlen(searchone)=0{
+		m_widthy = 1.0000 * (m_widthy + (onecontenty - m_widthy) / 7)
+	}else{
+		m_widthy = 1.0000 * (m_widthy + (onecontenty*(length(matchnum)+1) - m_widthy) / 5)
+	}
+	width ginfo_dispx/2, m_widthy
+	
+	gosub *searchwindow
+	gosub *search_mes
+	gosub *cursol
+	gosub *searchwindow_fin
+	gosub *windowcheck
+	redraw 1
+	await 10
+	goto *main
+*searchwindow
+	// window frame and backcolor
+	redraw 0
+	color 240,240,240
+	boxf
+	color 240,240,240
+	boxf 2,2,ginfo_sx-3,inputy-3
+	color 96,96,96
+	//boxf 2,inputy-3,ginfo_sx-3,inputy
+	color 240,240,240
+	boxf 2,inputy,ginfo_sx-3,ginfo_sy-3
+	return
+*search_mes
+	//strings. when u inputput nothing,this will show "search program..." . when u input something,this will show strings u input and result.
+	if strlen(search)=0{
+		color 192,192,192
+		font globalFont,fontsize,16
+		pos 20,fontposy
+		mes "Search program..."
+		meslength=0
+		selectcontent=0
+	}else{
+		color 64,64,64
+		font globalFont,fontsize,16
+		pos 20,fontposy
+		mes search
+		meslength=ginfo_mesx
+		lastLine = 0
+		repeat length(matchnum)
+			notesel fnindex
+			noteget strone,matchnum(cnt)
+			color 76, 90, 105
+			font globalFont,fontsize,16
+			pos fontsize+2,inputy*(cnt+1)+fontposy
+			if getpath(strone,18)=".lnk":strone=getpath(strone,1)
+			mes strone
+			if(strone != ""){
+				lastLine++
+			}
+		loop
+		
+		color 0, 139, 128 : pos fontsize+2, inputy*(lastLine+1) + fontposy
+		mes "Search \"" + search + "\" on web."
+		
+		if matches!0{
+			color 172, 186, 201 : boxf 2,inputy*(1+selectcontent),ginfo_sx-3,inputy*(2+selectcontent)
+			pos fontsize+2,inputy*(1+selectcontent)+fontposy
+			notesel fnindex
+			noteget strone,matchnum(selectcontent)
+			if getpath(strone,18)=".lnk":strone=getpath(strone,1)
+			color 44, 58, 73 : mes strone
+			color 16, 107, 96 : pos fontsize+2, inputy*(lastLine+1) + fontposy
+			mes "Search \"" + search + "\" on web."
+		}
+	}
+	if search!searchpast{
+		searchpast=search
+		gosub *result
+	}
+	return
+*searchwindow_fin
+	//reflect changes about UI.
+	redraw 1
+	return
+*cursol
+	//to blink cursol
+	cusl=(cusl+1)\50
+	if cusl<25{
+		color 64,64,64
+		boxf 20 + meslength,inputy-fontsize/2,20 + meslength+fontsize/2,inputy-fontsize/2
+	}
+	return
+*result
+	//when u input a character or delete,this code will be run once.
+	searchone=strtrim(search,0,32)
+	gosub *match
+	return
+*match
+	//search strings you input
+	repeat length(matchnum)
+		matchnum(cnt)=-1
+	loop
+	matches=0
+	endsearch=0
+	notesel fnindex
+	repeat notemax
+		noteget strone,cnt
+		if instr(strone,0,search)!-1{
+			lcnt=cnt
+			repeat length(matchnum)
+				if matchnum(cnt)=-1{
+					matchnum(cnt)=lcnt
+					matches++
+					break
+				}
+				if cnt=length(matchnum)-1{
+					endsearch=1
+				}
+			loop
+		}
+	loop
+	if endsearch=1:return
+	notesel fnindex
+	repeat notemax
+		noteget strone,cnt
+		strone=getpath(strone,16)
+		if instr(strone,0,getpath(search,16))!-1{
+			lcnt=cnt
+			repeat length(matchnum)
+				if matchnum(cnt)=lcnt{
+					break
+				}
+				if matchnum(cnt)=-1{
+					matchnum(cnt)=lcnt
+					matches++
+					break
+				}
+				if cnt=length(matchnum)-1{
+					endsearch=1
+				}
+			loop
+		}
+	loop
+	matches++ // to add "Search xxxx on web."
+	return
+*windowcheck
+	//active window check
+	if ginfo_act!0{
+		gosub *closeApp
+	}
+	return
+*inputwindow
+	if wparam=38{
+		//ª(ŽG‚Å‚·‹–‚¹)
+		selectcontent=limit(selectcontent-1,0,matches-1)
+	}
+	if wparam=40{
+		//«(ŽGd
+		selectcontent=limit(selectcontent+1,0,matches-1)
+	}
+	if iparam=27{
+		//if u typed escape key,this program will not do anything and exit this program.
+		gosub *closeApp
+	}
+	
+	if iparam=13{
+		//if u typed enter key,the app u selected will be started
+		if search="":end
+		notesel index
+		noteget strone,matchnum(selectcontent)
+		exist strone
+		if strsize!-1{
+			screen 0,1,1,screen_hide
+			gsel 0,-1
+			gsel 1,-1
+			exec strone,0,"open"
+//			alpha = 80
+//			while rounded = 0
+//				SetLayered background , 0 , alpha*255/100 , 2
+//				alpha = alpha + (0-alpha)/5
+//				rounded = intf(alpha)
+//				await 1
+//			wend
+			end
+		}else{
+			screen 0,1,1,screen_hide
+			gsel 0,-1
+			gsel 1,-1
+			exec "https://www.google.com/search?q=" + search, 16
+		}
+	}
+	return
+	
+*closeApp
+	gsel 0,-1
+	end

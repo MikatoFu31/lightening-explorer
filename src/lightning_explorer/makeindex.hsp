@@ -1,0 +1,116 @@
+//Version 20171122
+#packopt hide 1
+#packopt name "makeindex.exe"
+#include "strstack.as"
+#runtime "hsp3cl"
+*init
+	onerror gosub *error
+	mes "makeindex by MikatoFu31"
+	strstack_init
+	sdim opt,65536
+	opt=dir_cmdline
+	sdim apppath,65536
+	apppath=dir_cur
+	dim speed
+	dim pathtype
+	sdim nowdirlist,65536
+	sdim dirone,256
+	sdim nowdir
+	sdim list,131072
+	sdim listfn,131072
+	opt=strtrim(opt,0,' ')
+	opt=strtrim(opt,0,'\t')
+	if opt="background"{
+		speed=25
+	}
+	if opt="lowresource"{
+		speed=100
+	}
+	if opt="fast"{
+		speed=0
+	}
+	
+	await speed*2
+	
+	sdim musicpathes,65536
+	sdim musicpath,512
+	bload "playpath.rsv",musicpathes
+	strrep musicpathes,"%CURRENT%",apppath
+	strrep musicpathes,"%USERNAME%",sysinfo(1)
+	strrep musicpathes,"%MYDOCUMENT%",dir_mydoc
+	strrep musicpathes,"%DESKTOP%",dir_desktop
+	sdim filetype,65536
+	sdim ftone,256
+	bload "filetype.rsv",filetype
+	mes "Directory:"+musicpath
+	
+	await speed*2
+	
+	notesel musicpathes
+	repeat notemax
+		nowdir=""
+		notesel musicpathes
+		noteget musicpath,cnt
+		chdir musicpath+"\\"
+		nowdir=dir_cur
+		gosub *dirloop
+	loop
+	notesel list
+	notedel 0
+	notesel listfn
+	notedel 0
+	chdir apppath
+	bsave "playindex.rsv",list
+	bsave "playindex_fn.rsv",listfn
+	mes "Success. Indexes were exported to \""+apppath+"\\playindex.rsv\". "
+	end
+*dirloop
+	notesel filetype
+	repeat notemax
+		notesel filetype
+		noteget ftone,cnt
+		dirlist nowdirlist,"*."+ftone,3
+		notesel nowdirlist
+		repeat notemax
+			noteget dirone,cnt
+			mes "found:"+nowdir+"\\"+dirone
+			list+="\n"+nowdir+"\\"+dirone
+			listfn+="\n"+dirone
+			await speed
+		loop
+	loop
+	
+	
+	
+	dirlist nowdirlist,"*.*",5
+	strstack_push nowdirlist
+	notesel nowdirlist
+	repeat notemax
+		nowdirlist=strstack_look()
+		notesel nowdirlist
+		noteget dirone,cnt
+		if dirone="":break
+		dirlist dum,nowdir+"\\"+dirone,5
+		if stat=1{
+			chdir dirone
+		}else{
+			mes "Skip \" "+nowdir+"\\"+dirone+" \" : Cannot Access this folder."
+			continue
+		}
+		nowdir+="\\"+dirone
+		gosub *dirloop
+		chdir "..\\"
+		nowdir=dir_cur
+		await speed
+	loop
+	dum=strstack_pull()
+	return
+*error
+	mes "System error on line "+lparam
+	if wparam=12 & lparam=81{
+		mes "I/O Error : ",1
+		mes "Cannot Access \" "+dir_cur+"\\"+dirone+" \""
+		assert
+		return
+	}
+	mes "Error : "+wparam

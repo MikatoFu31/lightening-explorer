@@ -1,0 +1,9 @@
+*hsptmp
+changelog.txt
+*.exe
+*obj
+*packfile
+*.rsv
+start.ax
+built/*
+src/lightning_explorer/KosugiMaru-Regular.ttf

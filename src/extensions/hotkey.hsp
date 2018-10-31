@@ -1,0 +1,122 @@
+/****************************************************************
+  ほっとけーきＭＯＤ by @key (''
+  http://monooki.ldblog.jp/
+
+サンプル.hspにサンプルがあります
+
+キーコードとラベルを指定すると自動でホットキー処理をしてくれる形です
+最初にいろいろ処理用の変数とかを追加するだけで、
+あとはホットキーを押された時にしか負荷はかかりません
+
+飛んだラベル先では、[wParam]にホットキーのインデックス番号が入っています
+
+addhotkey _key,_shift,_lab
+	キーコードとラベルにホットキーを設定する
+		_keyに指定するキーコード(getkeyといっしょ)
+		_shiftに修飾子(下記、CtlrやAltなどの事)
+		_labに処理後の飛ぶ先のラベル(gosubで飛ぶのでreturnが必須)
+	
+	statに設定したインデックス(0～)が帰ってきます
+	-1ならなんかエラーです
+	基本これ一つで大丈夫です
+
+deltehotkey _p1
+	インデックスのホットキーを削除する
+		_indexにインデックス(addhotkeyで帰ってくるstat)
+	
+	statにエラーなら0以外が帰ってきます
+	全体のインデックスは変わりません
+
+unregHotkey
+	全部消す  終了時に自動で呼ばれます
+	全体のインデックスもリセットされます
+
+修飾子の説明
+	1	Altキー
+	2	Ctlrキー
+	4	Shiftキー
+	8	Windowsキー
+	複数なら加算して下さい
+	0にすればただそのキーを押したら反応するのになります
+	要するにonkeyと同じ　てかよく考えたらonkeyに毛が生えたやつじゃｎ
+
+
+あとgselで操作先を変えたらそっちのホットキーになります
+でもHSPのウィンドウがアクティブなら・・・って処理なので結局変わりません
+
+そんなに使わないだろうけど、登録できる最大数は128個です
+下のHOTKEY_MAXをいじれば最大数を変えられます
+
+ラベル型変数を使ったモジュールで、組んでいて楽しかったです
+
+2013/07/06	@key (''
+****************************************************************/
+
+//モジュール開始
+#ifndef __hotkey__
+#define __hotkey__
+#module "hotkey"
+
+//APIの登録
+#uselib "user32.dll"
+#func RegisterHotKey "RegisterHotKey" int,int,int,int
+#func UnregisterHotKey "UnregisterHotKey" int,int
+#define HOTKEY_MAX 128					;最大数の設定
+#define WM_HOTKEY $0312
+
+//変数登録＆未初期化回避
+ldim hotkeys@hotkey,HOTKEY_MAX@hotkey	;ホットキーイベント先登録用
+maxkey@hotkey=0							;登録済ホットキー数
+_lab@hotkey=*@f							;ラベル変数を初期化
+
+//ホットキー追加
+#define global addhotkey(%1,%2,%3) _lab@hotkey=%3 : _addhotkey@hotkey %1,%2	;バグ対策
+#deffunc local _addhotkey int _key,int _shift
+	if maxkey>HOTKEY_MAX-1 : return -1		;最大で128個まで
+	RegisterHotKey hwnd,maxkey,_shift,_key	;キーに戻ってくる番号を登録
+	if stat=0 : return -1					;エラー・・・
+	hotkeys(maxkey)=_lab					;インデックスにラベルを設定
+	maxkey++
+	return maxkey-1							;インデックスを返す
+//ホットキー削除
+#deffunc deltehotkey int _p1
+	UnregisterHotKey hWnd,_p1
+	return; stat
+//全部リセット
+#deffunc unregHotkey onexit
+	repeat maxkey
+		UnregisterHotKey hWnd,cnt	
+	loop		//deltehotkeyで消したやつはエラー出ると思う
+	maxkey=0
+	return 0
+#global
+
+//処理登録
+oncmd gosub *onHotKey@hotkey, WM_HOTKEY@hotkey
+
+goto *@f								;下のラベル実行回避
+
+*onHotKey@hotkey						;ホットキーが押された時 
+	//if ginfo(2)=-1|wParam>maxkey@hotkey-1 : return	;非アクティブかバグってたなら無反応
+	gosub hotkeys@hotkey(wParam) 		;登録されたラベルに飛ぶ
+	return
+
+*@
+#endif
+
+//モジュール終わり
+
+/*ゴミ箱
+
+;下はなんかlabelがバグって使えないひどい
+#deffunc addhotkey int _key,int _shift,label _lab
+	if maxkey>KEY_MAX-1 : return
+	RegisterHotKey hwnd,maxkey,_shift,_key
+	hotkeys(maxkey)=_lab
+	maxkey++
+	return
+#define MOD_ALT 1
+#define MOD_CONTROL 2
+#define MOD_SHIFT 4
+#define MOD_WIN 8
+*/
