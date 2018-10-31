@@ -1,11 +1,12 @@
-//Version 20171122
+//Version 20181031
+//(C) Mikatofu31
 #packopt hide 1
 #packopt name "makeindex.exe"
 #include "strstack.as"
 #runtime "hsp3cl"
 *init
 	onerror gosub *error
-	mes "makeindex by MikatoFu31"
+	mes "makeindex by Mikatofu31"
 	strstack_init
 	sdim opt,65536
 	opt=dir_cmdline
@@ -34,6 +35,11 @@
 	
 	sdim musicpathes,65536
 	sdim musicpath,512
+	exist "playpath.rsv"
+	if strsize=-1{
+		mes "notice: \"playpath.rsv\" made because it was not found."
+		bsave "playpath.rsv",musicpathes
+	}
 	bload "playpath.rsv",musicpathes
 	strrep musicpathes,"%CURRENT%",apppath
 	strrep musicpathes,"%USERNAME%",sysinfo(1)
@@ -41,6 +47,11 @@
 	strrep musicpathes,"%DESKTOP%",dir_desktop
 	sdim filetype,65536
 	sdim ftone,256
+	exist "filetype.rsv"
+	if strsize=-1{
+		mes "notice: \"filetype.rsv\" made because it was not found."
+		bsave "filetype.rsv",filetype
+	}
 	bload "filetype.rsv",filetype
 	mes "Directory:"+musicpath
 	

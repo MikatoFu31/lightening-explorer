@@ -255,7 +255,7 @@ return
 			SetWindowLong hwnd,-16,$16CA0000
 		swbreak
 		case 2 //////////////// creating index window /////////////////////////////////////////////////////////
-			dialog "Are you sure you want to make new index? \nOld one will be overwrited." ,2
+			dialog "Are you sure you want to make new index? \nOld one will be overwriten." ,2
 			if	(stat = 6){
 				gosub *startIndexing
 			}
@@ -279,6 +279,16 @@ return
 return
 
 *startIndexing
+	exist "filetype.rsv"
+	if strsize<=0{
+		filetype="exe\ncmd\nbat\nlnk\ncom"
+		bsave "filetype.rsv",filetype
+	}
+	exist "playpath.rsv"
+	if strsize<=0{
+		playpath="C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\nC:\\Users\\%USERNAME%\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu"
+		bsave "playpath.rsv",playpath
+	}
 	sdim ln,4096
 	sdim buf,128000
 	buf = ""

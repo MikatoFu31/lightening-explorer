@@ -61,12 +61,12 @@ beta 10
 
 	redraw 0
 		// back ground
-		bgscr 1, ginfo(20), ginfo(21),0,0,0
+		bgscr 1, ginfo(20), ginfo(21),screen_hide,0,0
 		color 0,0,0: boxf
 		gsel 1,-1
 		background = hwnd
 		// main window
-		bgscr 0,ginfo_dispx/2,onecontenty*(length(matchnum)+1),screen_tool,ginfo_dispx/4,ginfo_dispy/8,ginfo_dispx/2,onecontenty
+		bgscr 0,ginfo_dispx/2,onecontenty*(length(matchnum)+1),screen_tool+screen_hide,ginfo_dispx/4,ginfo_dispy/8,ginfo_dispx/2,onecontenty
 		title "Lightning Explorer beta"
 	
 		// display font
