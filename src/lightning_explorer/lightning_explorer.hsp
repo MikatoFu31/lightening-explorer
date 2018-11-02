@@ -269,7 +269,7 @@ return
 
 *saveAndExit
 	gosub *saveConfig
-	gsel 0, -1
+	gsel 1, -1
 
 *hideLogScreen
 	gsel 0, -1
