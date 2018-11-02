@@ -1,6 +1,6 @@
-// ------------- ƒ‚ƒWƒ…[ƒ‹ -------------
+// ------------- ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ« -------------
 assert
-#module 
+#module
 	#uselib "gdi32.dll"
 	#func AddFontResourceEx "AddFontResourceExA" sptr, int, nullptr
 	#func RemoveFontResourceEx "RemoveFontResourceExA" sptr, int, nullptr
@@ -15,15 +15,15 @@ assert
 		sendmsg 0xffff, 0x001D, 0, 0
 	return
 #global
-// ‚±‚±‚Ü‚ÅƒRƒs[‚µ‚Ä‚­‚¾‚³‚¢B
+// ã“ã“ã¾ã§ã‚³ãƒ”ãƒ¼ã—ã¦ãã ã•ã„ã€‚
 
-// ------------- ƒTƒ“ƒvƒ‹ -------------
+// ------------- ã‚µãƒ³ãƒ—ãƒ« -------------
 fontFile = "KosugiMaru-Regular.ttf"
-addFont fontFile // ƒtƒHƒ“ƒg‚ğ’Ç‰Á
+addFont fontFile // ãƒ•ã‚©ãƒ³ãƒˆã‚’è¿½åŠ 
 
 dialog
 font "MotoyaLMaru", 64
 dialog stat
 mes "test"
 
-removeFont fontFile // I—¹‘O‚ÉÀs‚µ‚Ä‚­‚¾‚³‚¢B
+removeFont fontFile // çµ‚äº†å‰ã«å®Ÿè¡Œã—ã¦ãã ã•ã„ã€‚
