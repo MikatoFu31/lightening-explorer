@@ -4,8 +4,22 @@
 #packopt name "makeindex.exe"
 #include "strstack.as"
 #runtime "hsp3cl"
+#runtime "hsp3mt"
+
+#module
+	#defcfunc getPathByShortcut str shortcut_path
+		newcom wshshell, "WScript.Shell"
+		slink = wshshell("CreateShortcut", shortcut_path)
+		resultpath = slink("TargetPath")
+		delcom slink
+		delcom wshshell
+		return resultpath
+
+#global
+
 *init
 	onerror gosub *error
+	onexit goto *exit
 	mes "makeindex by Mikatofu31"
 	strstack_init
 	sdim opt,65536
@@ -19,6 +33,7 @@
 	sdim nowdir
 	sdim list,131072
 	sdim listfn,131072
+	sdim listlinktarget,131072
 	opt=strtrim(opt,0,' ')
 	opt=strtrim(opt,0,'\t')
 	if opt="background"{
@@ -30,33 +45,38 @@
 	if opt="fast"{
 		speed=0
 	}
-	
+
 	await speed*2
-	
+
 	sdim musicpathes,65536
 	sdim musicpath,512
+
 	exist "playpath.rsv"
 	if strsize=-1{
-		mes "notice: \"playpath.rsv\" made because it was not found."
+		mes "Notice: \"playpath.rsv\" has been created."
 		bsave "playpath.rsv",musicpathes
 	}
 	bload "playpath.rsv",musicpathes
+
 	strrep musicpathes,"%CURRENT%",apppath
 	strrep musicpathes,"%USERNAME%",sysinfo(1)
 	strrep musicpathes,"%MYDOCUMENT%",dir_mydoc
 	strrep musicpathes,"%DESKTOP%",dir_desktop
+
 	sdim filetype,65536
 	sdim ftone,256
+
 	exist "filetype.rsv"
 	if strsize=-1{
-		mes "notice: \"filetype.rsv\" made because it was not found."
+		mes "Notice: \"filetype.rsv\" has been created."
 		bsave "filetype.rsv",filetype
 	}
 	bload "filetype.rsv",filetype
+
 	mes "Directory:"+musicpath
-	
+
 	await speed*2
-	
+
 	notesel musicpathes
 	repeat notemax
 		nowdir=""
@@ -73,8 +93,10 @@
 	chdir apppath
 	bsave "playindex.rsv",list
 	bsave "playindex_fn.rsv",listfn
+	bsave "playindex_linktarget.rsv",listlinktarget
 	mes "Success. Indexes were exported to \""+apppath+"\\playindex.rsv\". "
 	end
+
 *dirloop
 	notesel filetype
 	repeat notemax
@@ -86,13 +108,18 @@
 			noteget dirone,cnt
 			mes "found:"+nowdir+"\\"+dirone
 			list+="\n"+nowdir+"\\"+dirone
+			if getpath(nowdir+"\\"+dirone,18)=".lnk"{
+				listlinktarget += "\n" + getPathByShortcut(nowdir+"\\"+dirone)
+			}else{
+				listlinktarget += "\n" + nowdir+"\\"+dirone
+			}
 			listfn+="\n"+dirone
 			await speed
 		loop
 	loop
-	
-	
-	
+
+
+
 	dirlist nowdirlist,"*.*",5
 	strstack_push nowdirlist
 	notesel nowdirlist
@@ -105,7 +132,7 @@
 		if stat=1{
 			chdir dirone
 		}else{
-			mes "Skip \" "+nowdir+"\\"+dirone+" \" : Cannot Access this folder."
+			mes "Warning: Skiped \" "+nowdir+"\\"+dirone+" \" : Cannot access this folder."
 			continue
 		}
 		nowdir+="\\"+dirone
@@ -116,12 +143,17 @@
 	loop
 	dum=strstack_pull()
 	return
+
 *error
 	mes "System error on line "+lparam
 	if wparam=12 & lparam=81{
 		mes "I/O Error : ",1
-		mes "Cannot Access \" "+dir_cur+"\\"+dirone+" \""
+		mes "Cannot access \" "+dir_cur+"\\"+dirone+" \""
 		assert
 		return
 	}
 	mes "Error : "+wparam
+
+*exit
+	/* delcom wshshell */
+	end
