@@ -4,7 +4,6 @@
 #packopt name "makeindex.exe"
 #include "strstack.as"
 #runtime "hsp3cl"
-#runtime "hsp3mt"
 
 #module
 	#defcfunc getPathByShortcut str shortcut_path
