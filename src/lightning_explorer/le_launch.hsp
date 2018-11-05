@@ -1,4 +1,3 @@
-
 #packopt hide 1
 #packopt name "launcher.exe"
 
@@ -6,6 +5,7 @@
 #include "llmod3/ime.hsp"
 #include "hspmath.as"
 #include "../extensions/ini.as"
+
 
 #uselib "user32.dll"
 	#func GetWindowLongA "GetWindowLongA" int , int
@@ -21,6 +21,9 @@
 	sdim fnindex,1048576
 	exist "playindex_fn.rsv" : if strsize <=0 : dialog "The file \"playindex_fn.rsv\" was not found.\nPlease make index first." ,1 : end
 	bload "playindex_fn.rsv",fnindex
+
+	exist "playindex_linktarget.rsv" : if strsize <=0 : dialog "The file \"playindex_fn.rsv\" was not found.\nPlease make index first." ,1 : end
+	bload "playindex_linktarget.rsv",ltindex
 	// y size of one line of contents
 	dim onecontenty
 	onecontenty=ginfo_dispy/15
@@ -76,7 +79,7 @@
 		SetLayered background , 0 , 0*255/100 , 2
 		GetWindowLongA background, -20
 		SetWindowLongA background, -20 , stat | 0x00080000
-		alpha = 0
+		alpha = double(0)
 		gsel 1,1
 		gsel 0,2
 		pos ginfo_sx,ginfo_sy
@@ -94,11 +97,11 @@
 		}else{
 			isMached = 0
 		}
-		alpha = 1.0000 * (alpha + (isMached*80-alpha)/10)
+		alpha = double(1.0000 * (double(alpha) + (isMached*80-double(alpha))/5))
 		if strlen(searchone)=0{
-			m_widthy = 1.0000 * (m_widthy + (onecontenty - m_widthy) / 7)
+			m_widthy = 1.0000 * (double(m_widthy) + (onecontenty - m_widthy) / 5)
 		}else{
-			m_widthy = 1.0000 * (m_widthy + (onecontenty*(length(matchnum)+1) - m_widthy) / 5)
+			m_widthy = 1.0000 * (double(m_widthy) + (onecontenty*(length(matchnum)+1) - m_widthy) / 4)
 		}
 		width ginfo_dispx/2, m_widthy
 
@@ -143,18 +146,26 @@
 		lastLine = 0
 		repeat length(matchnum)
 			notesel fnindex
-			noteget strone,matchnum(cnt)
+			noteget strone_filename, matchnum(cnt)
+			notesel index
+			noteget strone, matchnum(cnt)
+			notesel ltindex
+			noteget strone_linktarget, matchnum(cnt)
 			color 76, 90, 105
-			font globalFont,fontsize,16
+			font globalFont, fontsize, 16
+			if getpath(strone_filename, 18)=".lnk": strone_filename = getpath(strone_filename, 1)
+			pos fontsize + 2, inputy*(cnt+1)+fontposy
+			mes strone_filename
+			pos fontsize + 100 + ginfo_mesx, inputy*(cnt + 1) + fontposy + 20
+			color : font globalFont, double(fontsize) * 0.6, 16 : mes strone
 			pos fontsize+2,inputy*(cnt+1)+fontposy
-			if getpath(strone,18)=".lnk":strone=getpath(strone,1)
-			mes strone
+
 			if(strone != ""){
 				lastLine++
 			}
 		loop
 
-		color 0, 139, 128 : pos fontsize+2, inputy*(lastLine+1) + fontposy
+		color 0, 139, 128 : pos fontsize+2, inputy*(lastLine+1) + fontposy : font globalFont, fontsize, 16
 		mes "Search \"" + search + "\" on web."
 
 		if matches!0{
@@ -165,7 +176,6 @@
 			if getpath(strone,18)=".lnk":strone=getpath(strone,1)
 			color 44, 58, 73 : mes strone
 			color 16, 107, 96 : pos fontsize+2, inputy*(lastLine+1) + fontposy
-			mes "Search \"" + search + "\" on web."
 		}
 	}
 	if search!searchpast{
@@ -196,19 +206,23 @@
 
 *match
 	//search strings you input
+	selectcontent=0
 	repeat length(matchnum)
 		matchnum(cnt)=-1
 	loop
+
 	matches=0
 	endsearch=0
+
 	notesel fnindex
+
 	repeat notemax
 		noteget strone,cnt
-		if instr(strone,0,search)!-1{
-			lcnt=cnt
+		if instr(strone, 0, search)!-1 {
+			lcnt = cnt
 			repeat length(matchnum)
-				if matchnum(cnt)=-1{
-					matchnum(cnt)=lcnt
+				if matchnum(cnt) = -1 {
+					matchnum(cnt) = lcnt
 					matches++
 					break
 				}
@@ -218,8 +232,11 @@
 			loop
 		}
 	loop
+
 	if endsearch=1:return
+
 	notesel fnindex
+
 	repeat notemax
 		noteget strone,cnt
 		strone=getpath(strone,16)
@@ -240,6 +257,7 @@
 			loop
 		}
 	loop
+
 	matches++ // to add "Search xxxx on web."
 	return
 
