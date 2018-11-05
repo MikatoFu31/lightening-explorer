@@ -153,11 +153,11 @@
 			noteget strone_linktarget, matchnum(cnt)
 			color 76, 90, 105
 			font globalFont, fontsize, 16
-			if getpath(strone_filename, 18)=".lnk": strone_filename = getpath(strone_filename, 1)
+      if getpath(strone_filename, 18)=".lnk": strone_filename = getpath(strone_filename, 1)
 			pos fontsize + 2, inputy*(cnt+1)+fontposy
 			mes strone_filename
 			pos fontsize + 100 + ginfo_mesx, inputy*(cnt + 1) + fontposy + 20
-			color : font globalFont, double(fontsize) * 0.6, 16 : mes strone
+			//color : font globalFont, double(fontsize) * 0.6, 16 : mes strone
 			pos fontsize+2,inputy*(cnt+1)+fontposy
 
 			if(strone != ""){
