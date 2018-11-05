@@ -94,7 +94,7 @@
 	en_font 	= "Gadugi Bold"
 	univ_font = "游ゴシック"
 
-	software_version = "1.2.6 Dev"
+	software_version = "1.3.0"
 
 	// タスクトレイにアイコン表示
 	screen 0
@@ -294,7 +294,7 @@
 
 	buf = ""
 	pipeexec buf, "makeindex.exe /h",1 // TODO: makeindex.exeを/hに対応させる（ログ表示ウィンドウをなくす）
-	
+
 	if (stat) {
 		dialog "Sorry. An error has occared while creating index.",1
 	}else{
