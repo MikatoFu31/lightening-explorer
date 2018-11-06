@@ -1,3 +1,5 @@
+#packopt name "Lightning Explorer.exe"
+
 #include "hspext.as"
 #include "shell32.as"
 /*#uselib "user32.dll"
@@ -247,9 +249,8 @@
 	return
 
 *openSettings //////////////// setting window ////////////////////////////////////////////////////////////////
-  bgscr 1, 300, 300
+  screen 1
 	gsel 1, 2
-	screen 1
 	title "Settings"
 	width 300,300
 	color 140, 154, 169 : boxf 20,13,25,67
@@ -261,7 +262,7 @@
 	pos 140, 100 : objsize 120,24
 	combox settings_searchengine, 120, "Google\nYahoo\nBing"
 
-	pos 20,250 : button gosub "Save and Exit", *saveAndExit
+	pos 20,250 : button gosub "Save and Exit", *hideWindow
 	pos 150,250 : button gosub "Quit", *onClose
 	SetWindowLong hwnd,-16,$16CA0000
 	return
