@@ -1,4 +1,5 @@
 #packopt name "Lightning Explorer.exe"
+#packopt icon "icon.ico"
 
 #include "hspext.as"
 #include "shell32.as"
@@ -12,6 +13,7 @@
 #include "../extensions/ini.as"
 //#include "../extensions/hspext.as"
 #include "hspmath.as"
+
 //////////////////////////////////////////// winapiが動かねぇ
 #module
 /*	#func  CloseHandle  "CloseHandle"  int
